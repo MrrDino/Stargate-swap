@@ -1,0 +1,9 @@
+version: '3.7'
+
+
+services:
+
+  swapper:
+    image: swapper
+    container_name: swapper
+    build: .
