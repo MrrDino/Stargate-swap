@@ -30,7 +30,9 @@
 ```git clone https://github.com/MrrDino/Stargate-swap.git```
 
 2. Перейдите в configs/configs.yaml и внесите данные для успешной работы:
+
 ![configs](images/configs.png)
+
 
 | Параметр       | Описание                                   |
 |:--------------:|:------------------------------------------:|
