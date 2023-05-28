@@ -9,7 +9,6 @@ from abis.erc20 import ERC20_ABI
 import constants as const
 
 import requests
-import math
 
 
 class Web3Client:
@@ -52,10 +51,9 @@ class Web3Client:
         router = w3.eth.contract(address=spender, abi=ROUTER_ABI)
         w3_2 = self.connect_node(self.receive_node)
 
-        gas_price = math.ceil(w3_2.eth.gas_price * const.NETWORK_LOAD)
-        avax_quantity = token_1_bal - gas_price * const.DEFAULT_GAS
+        avax_quantity = token_1_bal - w3_2.eth.gas_price * const.DEFAULT_GAS
 
-        logger.info(f"Gas_price: {gas_price}")
+        logger.info(f"Gas_price: {w3_2.eth.gas_price}")
         logger.info(f"AVAX quantity: {avax_quantity}")
 
         matic = self.get_matic_quantity(
@@ -68,7 +66,7 @@ class Web3Client:
         logger.info(f"MATIC quantity: {matic}")
 
         self.approve_tx(
-            gas_price=gas_price,
+            gas_price=w3_2.eth.gas_price,
             amount=token_0_bal,
             spender=spender,
             token=token_0,
@@ -89,7 +87,7 @@ class Web3Client:
             receive_network=receive_network,
             send_network=send_network,
             native_info=native_info,
-            gas_price=gas_price,
+            gas_price=w3_2.eth.gas_price,
             amount=token_0_bal,
             token=token_0_sym,
             wallet=wallet,
@@ -119,13 +117,17 @@ class Web3Client:
         allowance = token_contract.functions.allowance(signer, spender).call()
 
         if allowance < amount:
-            transaction = token_contract.functions.approve(spender, amount).build_transaction({
+            max_amount = Web3.to_wei(2 ** 64 - 1, 'ether')
+
+            transaction = token_contract.functions.approve(spender, max_amount).build_transaction({
                 'from': signer,
+                'gas': 200000,
                 'gasPrice': gas_price,
                 'nonce': w3.eth.get_transaction_count(signer)
             })
-            w3.eth.account.sign_transaction(transaction, self.private_key)
-            token_contract.functions.allowance(signer, spender).call()
+            approve_tx = w3.eth.account.sign_transaction(transaction, self.private_key)
+            tx = w3.eth.send_raw_transaction(approve_tx.rawTransaction)
+            logger.success(f'Транзакция подтвержения {tx.hex()}')
 
     def get_token_balance(
             self,
@@ -193,7 +195,7 @@ class Web3Client:
         ).build_transaction({
                 'from': wallet,
                 'value': fee,
-                'gasLimit': const.DEFAULT_GAS,
+                'gas': const.DEFAULT_GAS,
                 'gasPrice': gas_price,
                 'nonce': w3.eth.get_transaction_count(wallet)
         })
