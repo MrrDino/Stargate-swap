@@ -32,11 +32,12 @@
 2. Перейдите в configs/configs.yaml и внесите данные для успешной работы:
 ![configs](images/configs.png)
 
-
-    AVALANCHE_NODE -> rpc нода для сети Avalanche (alchemy/ankr)
-    POLYGON_NODE -> rpc нода для сети Polygon (alchemy/ankr)
-    PRIVATE_KEY -> приватный ключ
-    WALLET_ADDRESS -> адрес кошелька
+| Параметр       | Описание                                   |
+|:--------------:|:------------------------------------------:|
+| AVALANCHE_NODE | rpc нода для сети Avalanche (alchemy/ankr) |
+| POLYGON_NODE   | rpc нода для сети Polygon (alchemy/ankr)   |
+| PRIVATE_KEY    | приватный ключ                             |
+| WALLET_ADDRESS | адрес кошелька                             |
 
 3. Откройте консоль и перейдите в место хранения проекта:
 
